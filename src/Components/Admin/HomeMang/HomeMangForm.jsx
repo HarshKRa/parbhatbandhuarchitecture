@@ -4,25 +4,18 @@ import { styled } from "@mui/material/styles";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
-import DialogActions from "@mui/material/DialogActions";
 import CloseIcon from "@mui/icons-material/Close";
 import { AddPhotoAlternate, Close } from "@mui/icons-material";
 import {
   Button,
   CircularProgress,
-  FormControl,
-  FormHelperText,
   Grid2,
   IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
   TextField,
 } from "@mui/material";
-import { useFormik } from "formik";
-import { uploadToCloudnary } from "../../utils/UpoadToCloud";
-import { db } from "../../utils/firebaseConfig";
-import { addDoc, collection } from "firebase/firestore";
+import { uploadToCloudnary } from "../../../utils/UpoadToCloud";
+import { db } from "../../../utils/firebaseConfig";
+import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -33,83 +26,112 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-const HomeMangForm = () => {
-  const [open, setOpen] = React.useState(false);
-  const [uploadImage, setUploadImage] = useState(false);
-
-  const formik = useFormik({
-    initialValues: {
-      ProjectName: "",
-      Description: "",
-      images: [],
-    },
-    // validationSchema: {},
-    onSubmit: async (values) => {
-      try {
-        const response = await addDoc(collection(db, "HomeImage"), values);
-        console.log(response);
-        //   toast.success("User added successfully");
-        alert("Success");
-        navigate("/admin-console/home-mang");
-      } catch (error) {
-        console.log("Hello", error);
-        //   toast.error(error.message);
-      }
-    },
+const HomeMangForm = ({ data = {}, id, children }) => {
+  const [open, setOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [formData, setFormData] = useState({
+    projectName: data.projectName || "",
+    description: data.description || "",
+    images: data.images || [],
   });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   const handleImageChange = async (e) => {
     const file = e.target.files[0];
-    setUploadImage(true);
+    if (!file) return;
+    setUploading(true);
     const image = await uploadToCloudnary(file);
-    console.log(image);
-    formik.setFieldValue("images", [...formik.values.images, image]);
-    setUploadImage(false);
-  };
-  const handleRemoveImage = (index) => {
-    const updatedImages = [...formik.values.images];
-    updatedImages.splice(index, 1);
-    formik.setFieldValue("images", updatedImages);
+    setFormData((prev) => ({
+      ...prev,
+      images: [...prev.images, image],
+    }));
+    setUploading(false);
   };
 
-  const handleClickOpen = () => {
-    setOpen(true);
+  const handleRemoveImage = (index) => {
+    const updatedImages = [...formData.images];
+    updatedImages.splice(index, 1);
+    setFormData((prev) => ({
+      ...prev,
+      images: updatedImages,
+    }));
   };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (id) {
+        console.log("Hellooo", formData);
+        const docRef = doc(db, "HomeImage", id);
+        await updateDoc(docRef, formData);
+        alert("Project updated successfully!");
+      } else {
+        await addDoc(collection(db, "HomeImage"), formData);
+        alert("Project added successfully!");
+      }
+      handleClose();
+    } catch (error) {
+      console.error("Error adding project:", error);
+      alert("Error adding project.");
+    }
+  };
+
+  const handleClickOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
+    setFormData({
+      projectName: "",
+      description: "",
+      images: [],
+    });
   };
 
+  React.useEffect(() => {
+    if (open) {
+      setFormData({
+        projectName: data?.projectName || "",
+        description: data?.description || "",
+        images: data?.images || [],
+      });
+    }
+  }, [open, data]);
+
   return (
-    <React.Fragment>
+    <>
       <Button variant="outlined" onClick={handleClickOpen}>
-        Add New Project
+        {children}
       </Button>
       <BootstrapDialog
         onClose={handleClose}
-        aria-labelledby="customized-dialog-title"
         open={open}
+        aria-labelledby="customized-dialog-title"
       >
-        <DialogTitle
-          sx={{ m: 0, p: 2, textAlign: "center" }}
-          id="customized-dialog-title"
-        >
+        <DialogTitle sx={{ m: 0, p: 2, textAlign: "center" }}>
           Architecture Project Form
         </DialogTitle>
         <IconButton
           aria-label="close"
           onClick={handleClose}
-          sx={(theme) => ({
+          sx={{
             position: "absolute",
             right: 8,
             top: 8,
-            color: theme.palette.grey[500],
-          })}
+            color: (theme) => theme.palette.grey[500],
+          }}
         >
           <CloseIcon />
         </IconButton>
         <DialogContent dividers>
-          <form onSubmit={formik.handleSubmit} action="">
+          <form onSubmit={handleSubmit}>
             <Grid2 container spacing={2}>
-              {/* file */}
+              {/* File Upload */}
               <Grid2 className="flex flex-wrap gap-5" size={{ xs: 12 }}>
                 <input
                   type="file"
@@ -118,37 +140,27 @@ const HomeMangForm = () => {
                   style={{ display: "none" }}
                   onChange={handleImageChange}
                 />
-
                 <label className="relative" htmlFor="fileInput">
-                  <span
-                    className="w-24 h-24 cursor-pointer flex items-center
-               justify-center p-3 border rounded-md border-gray-400"
-                  >
+                  <span className="w-24 h-24 cursor-pointer flex items-center justify-center p-3 border rounded-md border-gray-400">
                     <AddPhotoAlternate className="text-gray-700" />
                   </span>
-                  {uploadImage && (
-                    <div
-                      className="absolute left-0 right-0 top-0 bottom-0 w-24 h-24 flex 
-                justify-center items-center"
-                    >
+                  {uploading && (
+                    <div className="absolute w-24 h-24 flex justify-center items-center top-0 left-0">
                       <CircularProgress />
                     </div>
                   )}
                 </label>
 
                 <div className="flex flex-wrap gap-2">
-                  {formik.values.images.map((image, index) => (
-                    <div className="relative">
+                  {formData?.images?.map((image, index) => (
+                    <div className="relative" key={index}>
                       <img
                         src={image}
-                        key={index}
-                        alt={`productImage ${index + 1}`}
+                        alt={`uploaded-${index}`}
                         className="w-24 h-24 object-cover"
                       />
-
                       <IconButton
                         onClick={() => handleRemoveImage(index)}
-                        className=""
                         size="small"
                         color="error"
                         sx={{
@@ -165,44 +177,29 @@ const HomeMangForm = () => {
                 </div>
               </Grid2>
 
-              {/* title */}
+              {/* Project Name */}
               <Grid2 size={{ xs: 12 }}>
                 <TextField
                   fullWidth
-                  id="ProjectName"
-                  name="ProjectName"
                   label="Project Name"
-                  value={formik.values.ProjectName}
-                  onChange={formik.handleChange}
-                  error={
-                    formik.touched.ProjectName &&
-                    Boolean(formik.errors.ProjectName)
-                  }
-                  helperText={
-                    formik.touched.ProjectName && formik.errors.ProjectName
-                  }
+                  name="projectName"
+                  value={formData.projectName}
+                  onChange={handleChange}
                 />
               </Grid2>
 
-              {/* description */}
+              {/* Description */}
               <Grid2 size={{ xs: 12 }}>
                 <TextField
                   fullWidth
-                  id="Description"
-                  name="Description"
                   label="Description"
-                  value={formik.values.Description}
-                  onChange={formik.handleChange}
-                  error={
-                    formik.touched.Description &&
-                    Boolean(formik.errors.Description)
-                  }
-                  helperText={
-                    formik.touched.Description && formik.errors.Description
-                  }
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
                 />
               </Grid2>
 
+              {/* Submit */}
               <Grid2 size={{ xs: 12 }}>
                 <Button
                   fullWidth
@@ -210,20 +207,15 @@ const HomeMangForm = () => {
                   type="submit"
                   color="primary"
                   sx={{ p: "14px" }}
-                  onClick={formik.onSubmit}
                 >
-                  {false ? (
-                    <CircularProgress size={"small"} />
-                  ) : (
-                    <p>Add Home Image</p>
-                  )}
+                  {id ? "Update Project" : "Add Project"}
                 </Button>
               </Grid2>
             </Grid2>
           </form>
         </DialogContent>
       </BootstrapDialog>
-    </React.Fragment>
+    </>
   );
 };
 

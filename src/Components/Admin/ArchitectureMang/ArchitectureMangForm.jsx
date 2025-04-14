@@ -10,19 +10,13 @@ import { AddPhotoAlternate, Close } from "@mui/icons-material";
 import {
   Button,
   CircularProgress,
-  FormControl,
-  FormHelperText,
   Grid2,
   IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
   TextField,
 } from "@mui/material";
-import { useFormik } from "formik";
-import { uploadToCloudnary } from "../../utils/UpoadToCloud";
-import { addDoc, collection } from "firebase/firestore";
-import { db } from "../../utils/firebaseConfig";
+import { uploadToCloudnary } from "../../../utils/UpoadToCloud";
+import { addDoc, collection, doc, updateDoc } from "firebase/firestore";
+import { db } from "../../../utils/firebaseConfig";
 
 const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   "& .MuiDialogContent-root": {
@@ -33,12 +27,46 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-const ArchitectureMangForm = () => {
+const ArchitectureMangForm = ({ data = {}, id, children }) => {
   const [open, setOpen] = React.useState(false);
   const [uploadImage, setUploadImage] = useState(false);
+  const [formValues, setFormValues] = useState({
+    ProjectName: data.ProjectName || "",
+    Description: data.Description || "",
+    images: data.images || [],
+    Location: data.Location || "",
+    Area: data.Area || "",
+    DateofCompletion: data.DateofCompletion || "",
+    Status: data.Status || "",
+    TypeOfBuilding: data.TypeOfBuilding || "",
+  });
 
-  const formik = useFormik({
-    initialValues: {
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues({ ...formValues, [name]: value });
+  };
+
+  const handleImageChange = async (e) => {
+    const file = e.target.files[0];
+    setUploadImage(true);
+    const image = await uploadToCloudnary(file);
+    setFormValues((prev) => ({ ...prev, images: [...prev.images, image] }));
+    setUploadImage(false);
+  };
+
+  const handleRemoveImage = (index) => {
+    const updatedImages = [...formValues.images];
+    updatedImages.splice(index, 1);
+    setFormValues({ ...formValues, images: updatedImages });
+  };
+
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setFormValues({
       ProjectName: "",
       Description: "",
       images: [],
@@ -47,49 +75,46 @@ const ArchitectureMangForm = () => {
       DateofCompletion: "",
       Status: "",
       TypeOfBuilding: "",
-    },
-    // validationSchema: {},
-    onSubmit: async (values) => {
-      alert("Hello");
-      try {
-        const response = await addDoc(
-          collection(db, "ArchitectureProject"),
-          values
-        );
-        console.log(response);
-        //   toast.success("User added successfully");
-        alert("Success");
-        navigate("/admin-console/architecture-mang");
-      } catch (error) {
-        console.log("Hello", error);
-        //   toast.error(error.message);
-      }
-    },
-  });
-  const handleImageChange = async (e) => {
-    const file = e.target.files[0];
-    setUploadImage(true);
-    const image = await uploadToCloudnary(file);
-    formik.setFieldValue("images", [...formik.values.images, image]);
-    setUploadImage(false);
-  };
-  const handleRemoveImage = (index) => {
-    const updatedImages = [...formik.values.images];
-    updatedImages.splice(index, 1);
-    formik.setFieldValue("images", updatedImages);
+    });
   };
 
-  const handleClickOpen = () => {
-    setOpen(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (id) {
+        const docRef = doc(db, "ArchitectureProject", id);
+        await updateDoc(docRef, formValues);
+        alert("Project updated successfully!");
+      } else {
+        await addDoc(collection(db, "ArchitectureProject"), formValues);
+        alert("Project added successfully!");
+      }
+      handleClose();
+    } catch (error) {
+      console.error("Error adding project:", error);
+      alert("Error adding project.");
+    }
   };
-  const handleClose = () => {
-    setOpen(false);
-  };
+
+  React.useEffect(() => {
+    if (open) {
+      setFormValues({
+        ProjectName: data?.ProjectName || "",
+        Description: data?.Description || "",
+        images: data?.images || [],
+        Location: data?.Location || "",
+        Area: data?.Area || "",
+        DateofCompletion: data?.DateofCompletion || "",
+        Status: data?.Status || "",
+        TypeOfBuilding: data?.TypeOfBuilding || "",
+      });
+    }
+  }, [open, data]);
 
   return (
     <React.Fragment>
       <Button variant="outlined" onClick={handleClickOpen}>
-        Add New Project
+        {children}
       </Button>
       <BootstrapDialog
         onClose={handleClose}
@@ -100,7 +125,7 @@ const ArchitectureMangForm = () => {
           sx={{ m: 0, p: 2, textAlign: "center" }}
           id="customized-dialog-title"
         >
-          Architecture Project Form
+          Architecture Manegment Form
         </DialogTitle>
         <IconButton
           aria-label="close"
@@ -115,7 +140,7 @@ const ArchitectureMangForm = () => {
           <CloseIcon />
         </IconButton>
         <DialogContent dividers>
-          <form onSubmit={formik.handleSubmit} action="">
+          <form onSubmit={handleSubmit}>
             <Grid2 container spacing={2}>
               {/* file */}
               <Grid2 className="flex flex-wrap gap-5" size={{ xs: 12 }}>
@@ -128,35 +153,26 @@ const ArchitectureMangForm = () => {
                 />
 
                 <label className="relative" htmlFor="fileInput">
-                  <span
-                    className="w-24 h-24 cursor-pointer flex items-center
-               justify-center p-3 border rounded-md border-gray-400"
-                  >
+                  <span className="w-24 h-24 cursor-pointer flex items-center justify-center p-3 border rounded-md border-gray-400">
                     <AddPhotoAlternate className="text-gray-700" />
                   </span>
                   {uploadImage && (
-                    <div
-                      className="absolute left-0 right-0 top-0 bottom-0 w-24 h-24 flex 
-                justify-center items-center"
-                    >
+                    <div className="absolute left-0 right-0 top-0 bottom-0 w-24 h-24 flex justify-center items-center">
                       <CircularProgress />
                     </div>
                   )}
                 </label>
 
                 <div className="flex flex-wrap gap-2">
-                  {formik.values.images.map((image, index) => (
-                    <div className="relative">
+                  {formValues.images.map((image, index) => (
+                    <div className="relative" key={index}>
                       <img
                         src={image}
-                        key={index}
                         alt={`productImage ${index + 1}`}
                         className="w-24 h-24 object-cover"
                       />
-
                       <IconButton
                         onClick={() => handleRemoveImage(index)}
-                        className=""
                         size="small"
                         color="error"
                         sx={{
@@ -180,15 +196,8 @@ const ArchitectureMangForm = () => {
                   id="ProjectName"
                   name="ProjectName"
                   label="Project Name"
-                  value={formik.values.ProjectName}
-                  onChange={formik.handleChange}
-                  error={
-                    formik.touched.ProjectName &&
-                    Boolean(formik.errors.ProjectName)
-                  }
-                  helperText={
-                    formik.touched.ProjectName && formik.errors.ProjectName
-                  }
+                  value={formValues.ProjectName}
+                  onChange={handleInputChange}
                 />
               </Grid2>
 
@@ -199,15 +208,8 @@ const ArchitectureMangForm = () => {
                   id="Description"
                   name="Description"
                   label="Description"
-                  value={formik.values.Description}
-                  onChange={formik.handleChange}
-                  error={
-                    formik.touched.Description &&
-                    Boolean(formik.errors.Description)
-                  }
-                  helperText={
-                    formik.touched.Description && formik.errors.Description
-                  }
+                  value={formValues.Description}
+                  onChange={handleInputChange}
                 />
               </Grid2>
 
@@ -218,12 +220,8 @@ const ArchitectureMangForm = () => {
                   id="Location"
                   name="Location"
                   label="Project Location"
-                  value={formik.values.Location}
-                  onChange={formik.handleChange}
-                  error={
-                    formik.touched.Location && Boolean(formik.errors.Location)
-                  }
-                  helperText={formik.touched.Location && formik.errors.Location}
+                  value={formValues.Location}
+                  onChange={handleInputChange}
                 />
               </Grid2>
 
@@ -234,10 +232,8 @@ const ArchitectureMangForm = () => {
                   id="Area"
                   name="Area"
                   label="Area of land"
-                  value={formik.values.Area}
-                  onChange={formik.handleChange}
-                  error={formik.touched.Area && Boolean(formik.errors.Area)}
-                  helperText={formik.touched.Area && formik.errors.Area}
+                  value={formValues.Area}
+                  onChange={handleInputChange}
                 />
               </Grid2>
 
@@ -248,16 +244,8 @@ const ArchitectureMangForm = () => {
                   id="DateofCompletion"
                   name="DateofCompletion"
                   label="Date of Completion"
-                  value={formik.values.DateofCompletion}
-                  onChange={formik.handleChange}
-                  error={
-                    formik.touched.DateofCompletion &&
-                    Boolean(formik.errors.DateofCompletion)
-                  }
-                  helperText={
-                    formik.touched.DateofCompletion &&
-                    formik.errors.DateofCompletion
-                  }
+                  value={formValues.DateofCompletion}
+                  onChange={handleInputChange}
                 />
               </Grid2>
 
@@ -268,32 +256,23 @@ const ArchitectureMangForm = () => {
                   id="Status"
                   name="Status"
                   label="Project Status"
-                  value={formik.values.Status}
-                  onChange={formik.handleChange}
-                  error={formik.touched.Status && Boolean(formik.errors.Status)}
-                  helperText={formik.touched.Status && formik.errors.Status}
+                  value={formValues.Status}
+                  onChange={handleInputChange}
                 />
               </Grid2>
 
-              {/* Area */}
+              {/* Type Of Building */}
               <Grid2 size={{ xs: 12 }}>
                 <TextField
                   fullWidth
                   id="TypeOfBuilding"
                   name="TypeOfBuilding"
                   label="Type Of Building"
-                  value={formik.values.TypeOfBuilding}
-                  onChange={formik.handleChange}
-                  error={
-                    formik.touched.TypeOfBuilding &&
-                    Boolean(formik.errors.TypeOfBuilding)
-                  }
-                  helperText={
-                    formik.touched.TypeOfBuilding &&
-                    formik.errors.TypeOfBuilding
-                  }
+                  value={formValues.TypeOfBuilding}
+                  onChange={handleInputChange}
                 />
               </Grid2>
+
               <Grid2 size={{ xs: 12 }}>
                 <Button
                   fullWidth
@@ -305,7 +284,7 @@ const ArchitectureMangForm = () => {
                   {false ? (
                     <CircularProgress size={"small"} />
                   ) : (
-                    <p>Add Project</p>
+                    <p>{id ? "Update Project" : "Add Project"}</p>
                   )}
                 </Button>
               </Grid2>

@@ -1,9 +1,9 @@
 import React from "react";
-import SideBar from "./SideBar";
-import ArchitectureMang from "./ArchitectureMang";
-import InteriorMang from "./InteriorMang";
+import SideBar from "./AdminNavBar";
 import { Route, Routes } from "react-router-dom";
-import HomeMang from "./HomeMang";
+import HomeMang from "./HomeMang/HomeMang";
+import ArchitectureMang from "./ArchitectureMang/ArchitectureMang";
+import InteriorMang from "./InteriorMang/InteriorMang";
 
 const AdminConsole = () => {
   return (

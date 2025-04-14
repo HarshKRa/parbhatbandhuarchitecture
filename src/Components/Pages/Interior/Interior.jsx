@@ -33,8 +33,18 @@ const Interior = () => {
     <div className="mt-8 p-10 flex flex-wrap gap-10 text-center">
       {data?.map((item) => {
         return (
-          <div>
-            <img className="h-[20vh] w-[20vw]" src={item.images[1]} alt="" />
+          <div
+            key={item.id}
+            onClick={() =>
+              navigate(`/interior-details/${item.id}`, { state: item })
+            }
+            className="cursor-pointer hover:scale-105 transition-all"
+          >
+            <img
+              className="h-[20vh] w-[20vw] object-cover"
+              src={item.images?.[1]}
+              alt=""
+            />
             <p>{item.ProjectName}</p>
             <p>{item.Location}</p>
           </div>

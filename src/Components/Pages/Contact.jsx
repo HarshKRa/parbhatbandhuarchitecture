@@ -46,8 +46,8 @@ const Contact = () => {
   return (
     <div className="p-8">
       <h1 className="text-3xl text-center font-semibold">Contact Us</h1>
-      <div className="flex mt-8">
-        <div className="flex flex-col border-r-2 w-[50vw] p-8 gap-2 text-center">
+      <div className="lg:flex mt-8 mx-auto">
+        <div className="flex flex-col lg:border-r-2 w-[50vw] p-8 gap-2 text-center mx-auto">
           <img
             className="h-40 w-40 mx-auto"
             src="https://picsum.photos/200/300"
@@ -63,7 +63,7 @@ const Contact = () => {
           </p>
         </div>
 
-        <div className="px-10 flex w-[50vw] py-10 justify-center">
+        <div className="px-10 flex w-[50vw] py-10 justify-center mx-auto">
           <form
             ref={formRef}
             className="flex flex-col gap-5 w-[30vw]"

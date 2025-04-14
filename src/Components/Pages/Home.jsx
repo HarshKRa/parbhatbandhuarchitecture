@@ -2,6 +2,7 @@ import { collection, getDocs } from "firebase/firestore";
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { db } from "../../utils/firebaseConfig";
+import { ArrowBackIosNew, ArrowForwardIos } from "@mui/icons-material";
 
 const Home = () => {
   const [index, setIndex] = useState(0);
@@ -17,6 +18,7 @@ const Home = () => {
         id: doc.id,
         ...doc.data(),
       }));
+
       const allImages = userList.map((item) => item.images).flat();
       setImageUrl(allImages);
     } catch (error) {
@@ -25,7 +27,6 @@ const Home = () => {
       setLoading(false);
     }
   }, []);
-
   useEffect(() => {
     fetchImages();
   }, [fetchImages]);
@@ -41,16 +42,14 @@ const Home = () => {
 
   return (
     <div className="mt-10 justify-center items-center">
-      <div className="flex justify-between items-center h-[60vh]">
+      <div className="flex justify-between items-center h-[60vh] px-4">
         {/* Left Arrow */}
-        <span
-          className="text-5xl cursor-pointer px-4 select-none"
-          onClick={() =>
-            setIndex((index - 1 + imageUrl.length) % imageUrl.length)
-          }
+        <button
+          className="transform -translate-y-1/2 text-black text-2xl z-10"
+          onClick={() => setIndex((index + 1) % imageUrl.length)}
         >
-          {"<"}
-        </span>
+          <ArrowBackIosNew fontSize="inherit" />
+        </button>
 
         {/* Image */}
         {imageUrl.length > 0 ? (
@@ -65,12 +64,12 @@ const Home = () => {
         )}
 
         {/* Right Arrow */}
-        <span
-          className="text-5xl cursor-pointer px-4 select-none"
+        <button
+          className="transform -translate-y-1/2 text-black text-2xl z-10"
           onClick={() => setIndex((index + 1) % imageUrl.length)}
         >
-          {">"}
-        </span>
+          <ArrowForwardIos fontSize="inherit" />
+        </button>
       </div>
 
       {/* Indicator Dots */}
