@@ -32,7 +32,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-const InteriorMangForm = ({ data = {}, id, children }) => {
+const InteriorMangForm = ({ data = {}, id, children, flag }) => {
   const [open, setOpen] = React.useState(false);
   const [uploadImage, setUploadImage] = useState(false);
   const [formValues, setFormValues] = useState({
@@ -119,9 +119,16 @@ const InteriorMangForm = ({ data = {}, id, children }) => {
 
   return (
     <React.Fragment>
-      <Button variant="outlined" onClick={handleClickOpen}>
+      <span
+        className={`${
+          flag === true
+            ? "border px-6 py-2 rounded-2xl hover:bg-[var(--secondaryColour)]"
+            : ""
+        } cursor-pointer`}
+        onClick={handleClickOpen}
+      >
         {children}
-      </Button>
+      </span>
       <BootstrapDialog
         onClose={handleClose}
         aria-labelledby="customized-dialog-title"

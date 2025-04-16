@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import ImageModel from "../../ImageModel/ImageModel";
+import "./ProjectDetails.css";
 
 const ProjectDetails = () => {
   const { state } = useLocation();
@@ -33,13 +34,15 @@ const ProjectDetails = () => {
 
   console.log(state);
   return (
-    <div className="mt-8 px-10">
-      <h1 className="text-center">{state.ProjectName}</h1>
-      <div className="flex flex-wrap gap-10 mt-6">
+    <div className="mt-8 px-10 text-[var(--primaryText)]">
+      <h1 className="text-center font-semibold text-2xl">
+        {state.ProjectName}
+      </h1>
+      <div className="flex flex-wrap justify-center gap-10 mt-6">
         {state?.images.map((item, index) => {
           return (
             <img
-              className="h-[20vh] w-[20vw] object-cover object-center"
+              className="h-[20vh] w-[20vw] object-cover object-center hover:scale-110"
               key={index}
               src={item}
               alt="image"
@@ -48,32 +51,32 @@ const ProjectDetails = () => {
           );
         })}
       </div>
-      <div className="flex mt-8">
-        <div className="w-[60vw]">
+      <div className="flex mt-10">
+        <div className="w-[55vw]">
           <p>
-            <span>Description :</span>
+            <span>Description : </span>
             {state.Description}
           </p>
           <p>
-            <span>Location :</span>
+            <span>Location : </span>
             {state.Location}
           </p>
           <p>
-            <span>TypeOfBuilding :</span>
+            <span>Type Of Building : </span>
             {state.TypeOfBuilding}
           </p>
         </div>
         <div>
           <p>
-            <span>Area :</span>
+            <span>Area : </span>
             {state.Area}
           </p>
           <p>
-            <span>DateofCompletion :</span>
+            <span>Date Of Completion : </span>
             {state.DateofCompletion}
           </p>
           <p>
-            <span>Status :</span>
+            <span>Status : </span>
             {state.Status}
           </p>
         </div>

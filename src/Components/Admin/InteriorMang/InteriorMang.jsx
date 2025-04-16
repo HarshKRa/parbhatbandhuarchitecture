@@ -5,7 +5,7 @@ import InteriorPageData from "./InteriorPageData";
 const InteriorMang = () => {
   return (
     <div>
-      <InteriorMangForm data={{}} id="">
+      <InteriorMangForm data={{}} id="" flag={true}>
         Add New Interior Projects
       </InteriorMangForm>
       <InteriorPageData />

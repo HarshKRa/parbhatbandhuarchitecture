@@ -14,8 +14,8 @@ import { Collections, Delete, Edit } from "@mui/icons-material";
 import HomeMangForm from "./HomeMangForm";
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
-    backgroundColor: theme.palette.common.black,
-    color: theme.palette.common.white,
+    backgroundColor: "var(--secondaryColour)",
+    color: "black",
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
@@ -24,7 +24,10 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
-    backgroundColor: theme.palette.action.hover,
+    backgroundColor: "var(--tertiaryColour)",
+  },
+  "&:nth-of-type(even)": {
+    backgroundColor: "var(--quadraColour)",
   },
   // hide last border
   "&:last-child td, &:last-child th": {

@@ -7,8 +7,10 @@
 :root {
   --primaryColour: #0a1828;
   --secondaryColour: #178582;
+  --tertiaryColour: #ccf7f1;
+  --quadraColour: #e3fcf9;
   --primaryText: #bfa181;
-  /* --secondaryText: rgb(76, 220, 175); */
+  --secondaryText: rgb(76, 220, 175);
 }
 
 body {
@@ -16,7 +18,7 @@ body {
   background-color: #0a1828;
   color: white;
 }
-
+/* 
 btn1 {
   background-color: var(--secondaryColour);
   color: var(--primaryText);
@@ -24,6 +26,6 @@ btn1 {
 
 btn2 {
   color: white;
-}
+} */
 
 /* Dark classic blue (#0A1828), turquoise (#178582), gold (#BFA181) */

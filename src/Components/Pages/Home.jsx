@@ -41,11 +41,11 @@ const Home = () => {
   }, [index, imageUrl]);
 
   return (
-    <div className="mt-10 justify-center items-center">
-      <div className="flex justify-between items-center h-[60vh] px-4">
+    <div className="flex flex-col justify-center h-[85vh]">
+      <div className="flex justify-between items-center px-4">
         {/* Left Arrow */}
         <button
-          className="transform -translate-y-1/2 text-black text-2xl z-10"
+          className="transform -translate-y-1/2 text-[var(--primaryText)] text-2xl z-10"
           onClick={() => setIndex((index + 1) % imageUrl.length)}
         >
           <ArrowBackIosNew fontSize="inherit" />
@@ -54,8 +54,7 @@ const Home = () => {
         {/* Image */}
         {imageUrl.length > 0 ? (
           <img
-            style={{ height: "60vh", width: "50vw" }}
-            className="mx-auto object-cover rounded shadow-md"
+            className="mx-auto lg:h-[70vh] lg:w-[60vw] h-[60vh] w-[80vw] object-cover rounded shadow-md"
             src={imageUrl[index]}
             alt={`carousel-${index}`}
           />
@@ -65,7 +64,7 @@ const Home = () => {
 
         {/* Right Arrow */}
         <button
-          className="transform -translate-y-1/2 text-black text-2xl z-10"
+          className="transform -translate-y-1/2 text-[var(--primaryText)] text-2xl z-10"
           onClick={() => setIndex((index + 1) % imageUrl.length)}
         >
           <ArrowForwardIos fontSize="inherit" />
@@ -73,12 +72,14 @@ const Home = () => {
       </div>
 
       {/* Indicator Dots */}
-      <div className="flex gap-4 mt-8 justify-center">
+      <div className="flex gap-4 mt-10 justify-center">
         {imageUrl.map((_, ind) => (
           <span
             key={ind}
             className={`h-2 w-2 rounded-full border transition-all duration-300 ${
-              index === ind ? "bg-black scale-125" : "bg-gray-300"
+              index === ind
+                ? "bg-[var(--secondaryColour)] scale-150"
+                : "bg-gray-300"
             }`}
           ></span>
         ))}

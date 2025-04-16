@@ -26,7 +26,7 @@ const BootstrapDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-const HomeMangForm = ({ data = {}, id, children }) => {
+const HomeMangForm = ({ data = {}, id, children, flag }) => {
   const [open, setOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState({
@@ -105,9 +105,16 @@ const HomeMangForm = ({ data = {}, id, children }) => {
 
   return (
     <>
-      <Button variant="outlined" onClick={handleClickOpen}>
+      <span
+        className={`${
+          flag === true
+            ? "border px-6 py-2 rounded-2xl hover:bg-[var(--secondaryColour)]"
+            : ""
+        } cursor-pointer`}
+        onClick={handleClickOpen}
+      >
         {children}
-      </Button>
+      </span>
       <BootstrapDialog
         onClose={handleClose}
         open={open}

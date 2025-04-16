@@ -1,5 +1,8 @@
+import { Button } from "@mui/material";
+import { signOut } from "firebase/auth";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { auth } from "../../utils/firebaseConfig";
 
 const data = [
   {
@@ -19,21 +22,35 @@ const data = [
 const SideBar = () => {
   const [ind, setIndex] = useState(0);
   const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate("/login");
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
   // alert(ind);
   return (
-    <>
-      <div className="flex justify-between items-center px-10 py-2 mb-4 text-xl md:text-lg font-bold">
-        <button
+    <div className="h-[12vh] text-[var(--secondaryColour)] mb-8">
+      <div className="flex justify-between align-middle items-center px-10 text-xl md:text-lg font-bold h-full">
+        <p
           onClick={() => navigate("/home")}
           className="text-2xl hover:text-black transition-colors duration-200 cursor-pointer"
         >
           Parbhat Bandhu
-        </button>
-        <div className="flex gap-10 text-xl font-bold cursor-pointer">
+        </p>
+        <div className="flex gap-10 cursor-pointer">
           {data.map((item, index) => {
             return (
               <p
-                className={`${ind == index ? "underline" : ""}`}
+                key={index}
+                className={`${
+                  ind == index
+                    ? "scale-110 underline text-[var(--primaryText)]"
+                    : ""
+                } hover:scale-110 hover:underline transition-all duration-200`}
                 onClick={() => {
                   navigate(`${item.link}`);
                   setIndex(index);
@@ -44,15 +61,17 @@ const SideBar = () => {
             );
           })}
         </div>
-        <button
-          onClick={() => navigate("/login")}
-          className="bg-blue-950 text-white font-semibold rounded-lg text-sm px-5 py-2 hover:bg-blue-900 transition-colors duration-200 cursor-pointer"
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleLogout}
+          sx={{ textTransform: "none", fontWeight: 600 }}
         >
           Logout
-        </button>
+        </Button>
       </div>
       <div className="bg-gray-400 h-0.5 mb-2"></div>
-    </>
+    </div>
   );
 };
 

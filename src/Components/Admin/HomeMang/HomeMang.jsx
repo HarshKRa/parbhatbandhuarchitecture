@@ -5,7 +5,7 @@ import HomePageData from "./HomePageData";
 const HomeMang = () => {
   return (
     <div>
-      <HomeMangForm data={{}} id="">
+      <HomeMangForm data={{}} id="" flag={true}>
         Add Home Page Image
       </HomeMangForm>
       <HomePageData />

@@ -5,7 +5,7 @@ import ArchitecturePageData from "./ArchitecturePageData";
 const ArchitectureMang = () => {
   return (
     <div>
-      <ArchitectureMangForm data={{}} id="">
+      <ArchitectureMangForm data={{}} id="" flag={true}>
         Add New Architecture Project
       </ArchitectureMangForm>
       <ArchitecturePageData />
